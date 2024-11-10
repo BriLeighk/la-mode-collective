@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import p5 from 'p5';
 import { BackwardIcon, ForwardIcon } from '@heroicons/react/24/outline';
-import { getFirestore, collection, getDocs } from "firebase/firestore";
+import { getFirestore, collection, getDocs, addDoc } from "firebase/firestore";
 import { getStorage, ref, getDownloadURL } from "firebase/storage";
 
 function Drawers({ refreshKey }) {
@@ -151,6 +151,21 @@ function Drawers({ refreshKey }) {
     setBottomsIndex((prevIndex) => (prevIndex - 1 + bottomsImages.length) % bottomsImages.length);
   };
 
+  const saveCurrentPair = async () => {
+    const db = getFirestore();
+    try {
+      await addDoc(collection(db, 'outfitPairs'), {
+        top: images[currentIndex],
+        bottom: bottomsImages[bottomsIndex],
+        createdAt: new Date()
+      });
+      alert('Outfit pair saved successfully!');
+    } catch (error) {
+      console.error("Error saving outfit pair:", error);
+      alert('Failed to save outfit pair.');
+    }
+  };
+
   return (
     <div className="flex flex-col items-center absolute top-[50%] left-[50%] transform -translate-x-1/2">
       <div className="flex items-center justify-center w-[180px] h-[150px] bg-[#4d5d53] shadow-md shadow-black mt-4">
@@ -171,7 +186,7 @@ function Drawers({ refreshKey }) {
           onClick={handleNextImage}
         />
       </div>
-      <div className="flex items-center justify-center w-[180px] h-[150px] bg-[#4d5d53] shadow-md shadow-black mt-4">
+      <div className="flex items-center justify-center w-[180px] h-[150px] bg-[#4d5d53] shadow-md shadow-black">
         <img
           src={bottomsImages[bottomsIndex] || '/bottoms-placeholder.png'}
           alt="Bottom"
@@ -189,6 +204,12 @@ function Drawers({ refreshKey }) {
           onClick={handleNextBottomsImage}
         />
       </div>
+      <button
+        onClick={saveCurrentPair}
+        className="mt-4 px-4 py-2 bg-[#A2E8B8] text-[#4D5D53] font-semibold rounded-lg shadow-md hover:bg-[#88c9a7] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#88c9a7]"
+      >
+        Save Outfit Pair
+      </button>
     </div>
   );
 }
