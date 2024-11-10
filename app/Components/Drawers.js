@@ -88,10 +88,12 @@ function Drawers({ refreshKey }) {
           p.clear();
           p.stroke(0);
 
-          // Draw the dresser image in the background
+          // Draw the dresser image in the background with a fixed width and centered
           p.push();
-          p.translate(-p.width / 2, -p.height / 2, -200);
-          p.image(img, 0, 0, p.width, p.height);
+          const dresserWidth = 750; // Set your desired fixed width
+          const dresserHeight = 700; // Set your desired fixed height
+          p.translate(-dresserWidth / 2, -dresserHeight / 2, -200); // Center the dresser
+          p.image(img, 0, 0, dresserWidth, dresserHeight);
           p.pop();
 
           // Draw each drawer in the array
