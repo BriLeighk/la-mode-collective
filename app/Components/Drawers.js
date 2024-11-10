@@ -279,6 +279,14 @@ function Drawers({ refreshKey }) {
         ...currentPair,
         createdAt: new Date()
       });
+
+      // Update the state with the new pair
+      setOutfitPairs(prevPairs => {
+        const updatedPairs = [...prevPairs, currentPair];
+        setVisibleHangers(updatedPairs.length); // Update visible hangers
+        return updatedPairs;
+      });
+
       alert('Outfit pair saved successfully!');
     } catch (error) {
       console.error("Error saving outfit pair:", error);
