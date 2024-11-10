@@ -22,8 +22,8 @@ body {
   cursor: url('/star-4pt-round.svg'), auto;
 }
 
-a {
-  cursor: url('/heart-outline.svg'), pointer;
+a, img, button {
+  cursor: url('/arrow-cursor.svg'), pointer;
 }
 
 

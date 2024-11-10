@@ -4,8 +4,6 @@ import { useState } from 'react';
 import { createUserWithEmailAndPassword, fetchSignInMethodsForEmail } from 'firebase/auth';
 import { auth } from '../../firebase';
 
-
-
 export default function Register() {
     const [fullName, setFullName] = useState('');
     const [email, setEmail] = useState('');
@@ -38,12 +36,13 @@ export default function Register() {
                 return;
             }
 
-
             await createUserWithEmailAndPassword(auth, email, password);
             setShowSuccess(true);
             setShowError(false);
             setTimeout(() => {
-                window.location.href = '/login';
+                if (typeof window !== 'undefined') {
+                    window.location.href = '/login';
+                }
             }, 2000); // 2-second delay
         } catch (err) {
             setError(err.message);
