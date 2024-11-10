@@ -32,7 +32,7 @@ export default function Closet() {
             {/* Add New Outfit Button */}
             <button
               onClick={() => setShowModal(true)}
-              className="mt-6 px-4 py-2 bg-[#A2E8B8] text-[#4D5D53] font-semibold rounded-lg shadow-md hover:bg-[#88c9a7] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#88c9a7]"
+              className="mt-6 px-4 py-2 bg-[#4D5D53] text-[#D0F0C0] hover:text-[#4D5D53] font-semibold rounded-lg shadow-md hover:bg-[#D0D0D0] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#88c9a7]"
             >
               Upload Item to Wardrobe
             </button>

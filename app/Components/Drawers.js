@@ -3,12 +3,15 @@ import p5 from 'p5';
 import { BackwardIcon, ForwardIcon } from '@heroicons/react/24/outline';
 import { getFirestore, collection, getDocs, addDoc } from "firebase/firestore";
 import { getStorage, ref, getDownloadURL } from "firebase/storage";
+import OutfitModal from './OutfitModal';
 
 function Drawers({ refreshKey }) {
   const [images, setImages] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [bottomsImages, setBottomsImages] = useState([]);
   const [bottomsIndex, setBottomsIndex] = useState(0);
+  const [outfitPairs, setOutfitPairs] = useState([]);
+  const [hoveredPairIndex, setHoveredPairIndex] = useState(null);
 
   useEffect(() => {
     const fetchImages = async () => {
@@ -38,6 +41,17 @@ function Drawers({ refreshKey }) {
   }, [refreshKey]);
 
   useEffect(() => {
+    const fetchOutfitPairs = async () => {
+      const db = getFirestore();
+      const querySnapshot = await getDocs(collection(db, 'outfitPairs'));
+      const pairs = querySnapshot.docs.slice(0, 4).map(doc => doc.data());
+      setOutfitPairs(pairs);
+    };
+
+    fetchOutfitPairs();
+  }, [refreshKey]);
+
+  useEffect(() => {
     if (typeof window !== 'undefined') {
       const sketch = (p) => {
         let img;
@@ -47,6 +61,13 @@ function Drawers({ refreshKey }) {
           { x: -200, y: 40, z: -50, depth: 100, open: false },
           { x: -200, y: 150, z: -50, depth: 100, open: false }
         ];
+
+        let rodY = -180;
+        let rodStartX = 105;
+        let rodEndX = 290;
+        let spacing = 50;
+        let visibleHangers = 4;
+        let hangerDrop = 10;
 
         p.preload = () => {
           img = p.loadImage('/dresser.png');
@@ -96,15 +117,55 @@ function Drawers({ refreshKey }) {
             p.pop();
           }
 
-          // Draw hangers over dresser
-          // Add the new div container and its elements
+          // Draw the clothing rack
           p.push();
-          p.translate(0, -45, 0); // Adjust the position as needed
-          p.noStroke();
-          p.fill('#4d5d53');
-          p.box(200, 380, 10); // Background box for the new div
+          p.stroke("#35261F");
+          p.strokeWeight(4);
+          p.line(rodStartX, rodY, rodEndX, rodY);
+
+          for (let i = 0; i < visibleHangers; i++) {
+            let x = rodStartX + spacing / 2 + (i * spacing);
+            drawOutlinedHanger(p, x, rodY + hangerDrop, i);
+          }
           p.pop();
         };
+
+        function drawOutlinedHanger(p, x, y, index) {
+          p.stroke("#4D5D53");
+          p.strokeWeight(2);
+          p.noFill();
+
+          p.beginShape();
+          p.vertex(x, y - 10);
+          p.bezierVertex(x - 2.5, y - 20, x + 5, y - 20, x, y - 15);
+          p.endShape();
+
+          p.beginShape();
+          p.vertex(x - 15, y);
+          p.bezierVertex(x - 10, y - 7.5, x + 10, y - 7.5, x + 15, y);
+          p.vertex(x + 12.5, y + 2.5);
+          p.vertex(x - 12.5, y + 2.5);
+          p.endShape(p.CLOSE);
+
+          p.line(x - 12.5, y + 2.5, x + 12.5, y + 2.5);
+
+          p.beginShape();
+          p.vertex(x - 15, y); 
+          p.vertex(x - 17.5, y + 2.5);
+          p.vertex(x - 16.5, y + 3.5);
+          p.endShape();
+
+          p.beginShape();
+          p.vertex(x + 15, y);
+          p.vertex(x + 17.5, y + 2.5);
+          p.vertex(x + 16.5, y + 3.5);
+          p.endShape();
+
+          // Add hover detection
+          if (p.mouseX > x - 15 && p.mouseX < x + 15 && p.mouseY > y - 10 && p.mouseY < y + 10) {
+            setHoveredPairIndex(index);
+          }
+        }
 
         p.mousePressed = () => {
           let mx = p.mouseX - p.width / 2;
@@ -133,7 +194,7 @@ function Drawers({ refreshKey }) {
         p5Instance.remove();
       };
     }
-  }, []);
+  }, [outfitPairs]);
 
   const handleNextImage = () => {
     setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
@@ -154,9 +215,28 @@ function Drawers({ refreshKey }) {
   const saveCurrentPair = async () => {
     const db = getFirestore();
     try {
-      await addDoc(collection(db, 'outfitPairs'), {
+      // Fetch existing outfit pairs
+      const querySnapshot = await getDocs(collection(db, 'outfitPairs'));
+      const existingPairs = querySnapshot.docs.map(doc => doc.data());
+
+      // Check if the current pair already exists
+      const currentPair = {
         top: images[currentIndex],
-        bottom: bottomsImages[bottomsIndex],
+        bottom: bottomsImages[bottomsIndex]
+      };
+
+      const pairExists = existingPairs.some(pair => 
+        pair.top === currentPair.top && pair.bottom === currentPair.bottom
+      );
+
+      if (pairExists) {
+        alert('This outfit pair has already been saved.');
+        return;
+      }
+
+      // Save the new outfit pair
+      await addDoc(collection(db, 'outfitPairs'), {
+        ...currentPair,
         createdAt: new Date()
       });
       alert('Outfit pair saved successfully!');
@@ -168,7 +248,7 @@ function Drawers({ refreshKey }) {
 
   return (
     <div className="flex flex-col items-center absolute top-[50%] left-[50%] transform -translate-x-1/2">
-      <div className="flex items-center justify-center w-[180px] h-[150px] bg-[#4d5d53] shadow-md shadow-black mt-4">
+      <div className="flex items-center justify-center w-[180px] h-[150px] bg-[#D0D0D0] shadow-md shadow-black mt-4">
         <img
           src={images[currentIndex] || '/image-placeholder.png'}
           alt="Outfit"
@@ -186,7 +266,7 @@ function Drawers({ refreshKey }) {
           onClick={handleNextImage}
         />
       </div>
-      <div className="flex items-center justify-center w-[180px] h-[150px] bg-[#4d5d53] shadow-md shadow-black">
+      <div className="flex items-center justify-center w-[180px] h-[150px] bg-[#D0D0D0] shadow-md shadow-black">
         <img
           src={bottomsImages[bottomsIndex] || '/bottoms-placeholder.png'}
           alt="Bottom"
@@ -206,10 +286,15 @@ function Drawers({ refreshKey }) {
       </div>
       <button
         onClick={saveCurrentPair}
-        className="mt-4 px-4 py-2 bg-[#A2E8B8] text-[#4D5D53] font-semibold rounded-lg shadow-md hover:bg-[#88c9a7] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#88c9a7]"
+        className="mt-4 px-4 py-2 bg-[#4D5D53] text-[#D0F0C0] font-semibold rounded-lg shadow-md hover:bg-[#D0D0D0] hover:text-[#4D5D53] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#88c9a7]"
       >
         Save Outfit Pair
       </button>
+      <OutfitModal
+        isVisible={hoveredPairIndex !== null}
+        onClose={() => setHoveredPairIndex(null)}
+        pair={outfitPairs[hoveredPairIndex]}
+      />
     </div>
   );
 }
