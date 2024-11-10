@@ -15,17 +15,21 @@ export default function Header() {
   }, []);
 
   const handleProfileClick = () => {
-    if (user) {
-      window.location.href = '/Dashboard';
-    } else {
-      window.location.href = '/login';
+    if (typeof window !== 'undefined') {
+      if (user) {
+        window.location.href = '/Dashboard';
+      } else {
+        window.location.href = '/login';
+      }
     }
   };
 
   const handleLogout = async () => {
     try {
       await logout();
-      window.location.href = '/login'; // Redirect to login page after logout
+      if (typeof window !== 'undefined') {
+        window.location.href = '/login'; // Redirect to login page after logout
+      }
     } catch (error) {
       console.error('Error logging out:', error);
     }

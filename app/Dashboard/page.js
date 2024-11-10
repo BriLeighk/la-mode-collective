@@ -1,11 +1,12 @@
 "use client";
-import { useState, useEffect } from 'react';
-import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
-import { ForwardIcon, BackwardIcon } from '@heroicons/react/24/outline';
+import { useState } from 'react';
+import dynamic from 'next/dynamic';
 import Header from '../Components/Header';
 import OutfitModal from './OutfitModal'; // Ensure the path is correct
-import DoubleDoors from '../Components/DoubleDoors';
-import Drawers from '../Components/Drawers'; // Ensure the path is correct
+
+// Dynamically import components that rely on the window object
+const DoubleDoors = dynamic(() => import('../Components/DoubleDoors'), { ssr: false });
+const Drawers = dynamic(() => import('../Components/Drawers'), { ssr: false });
 
 export default function Closet() {
   const [showModal, setShowModal] = useState(false);

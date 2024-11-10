@@ -18,7 +18,9 @@ export default function Login() {
             setShowSuccess(true);
             setShowError(false);
             setTimeout(() => {
-                window.location.href = '/Dashboard';
+                if (typeof window !== 'undefined') {
+                    window.location.href = '/Dashboard';
+                }
             }, 2000); // 2-second delay
         } catch (err) {
             setError(err.message);
