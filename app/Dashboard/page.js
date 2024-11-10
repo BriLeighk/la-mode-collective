@@ -1,5 +1,5 @@
 "use client";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 import { ForwardIcon, BackwardIcon } from '@heroicons/react/24/outline';
 import Header from '../Components/Header';
@@ -9,6 +9,13 @@ import Drawers from '../Components/Drawers'; // Ensure the path is correct
 
 export default function Closet() {
   const [showModal, setShowModal] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      // Place your window-dependent code here
+      // Example: console.log(window.innerWidth);
+    }
+  }, []);
 
   return (
     <>
