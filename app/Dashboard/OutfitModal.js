@@ -3,7 +3,7 @@ import { getStorage, ref, uploadString, getDownloadURL } from "firebase/storage"
 import { getFirestore, collection, addDoc } from "firebase/firestore";
 import axios from 'axios';
 
-export default function OutfitModal({ isVisible, onClose }) {
+export default function OutfitModal({ isVisible, onClose, onUpload }) {
   const [category, setCategory] = useState('');
   const [subType, setSubType] = useState('');
   const [selectedColors, setSelectedColors] = useState([]);
@@ -103,6 +103,7 @@ export default function OutfitModal({ isVisible, onClose }) {
       setImage(null);
       setStep(1);
       onClose();
+      onUpload();
     } catch (error) {
       console.error("Error uploading image or storing data:", error);
       setFormError('Failed to upload image or store data.');

@@ -4,9 +4,11 @@ import { BackwardIcon, ForwardIcon } from '@heroicons/react/24/outline';
 import { getFirestore, collection, getDocs } from "firebase/firestore";
 import { getStorage, ref, getDownloadURL } from "firebase/storage";
 
-function Drawers() {
+function Drawers({ refreshKey }) {
   const [images, setImages] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [bottomsImages, setBottomsImages] = useState([]);
+  const [bottomsIndex, setBottomsIndex] = useState(0);
 
   useEffect(() => {
     const fetchImages = async () => {
@@ -14,21 +16,26 @@ function Drawers() {
       const storage = getStorage();
       const querySnapshot = await getDocs(collection(db, 'outfits'));
       const imageUrls = [];
+      const bottomsUrls = [];
 
       for (const doc of querySnapshot.docs) {
         const data = doc.data();
+        const imageRef = ref(storage, `${data.image}`);
+        const url = await getDownloadURL(imageRef);
+
         if (data.category === 'top') {
-          const imageRef = ref(storage, `${data.image}`);
-          const url = await getDownloadURL(imageRef);
           imageUrls.push(url);
+        } else if (data.category === 'bottom') {
+          bottomsUrls.push(url);
         }
       }
 
       setImages(imageUrls);
+      setBottomsImages(bottomsUrls);
     };
 
     fetchImages();
-  }, []);
+  }, [refreshKey]);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -136,6 +143,14 @@ function Drawers() {
     setCurrentIndex((prevIndex) => (prevIndex - 1 + images.length) % images.length);
   };
 
+  const handleNextBottomsImage = () => {
+    setBottomsIndex((prevIndex) => (prevIndex + 1) % bottomsImages.length);
+  };
+
+  const handlePreviousBottomsImage = () => {
+    setBottomsIndex((prevIndex) => (prevIndex - 1 + bottomsImages.length) % bottomsImages.length);
+  };
+
   return (
     <div className="flex flex-col items-center absolute top-[50%] left-[50%] transform -translate-x-1/2">
       <div className="flex items-center justify-center w-[180px] h-[150px] bg-[#4d5d53] shadow-md shadow-black mt-4">
@@ -156,13 +171,23 @@ function Drawers() {
           onClick={handleNextImage}
         />
       </div>
-      <div className="flex items-center justify-center w-[180px] h-[150px] bg-[#4d5d53] shadow-md shadow-black">
-        <img src="/bottoms-placeholder.png" alt="Outfit 1" className="w-[90%] h-[90%] object-cover shadow-md shadow-black"/>
+      <div className="flex items-center justify-center w-[180px] h-[150px] bg-[#4d5d53] shadow-md shadow-black mt-4">
+        <img
+          src={bottomsImages[bottomsIndex] || '/bottoms-placeholder.png'}
+          alt="Bottom"
+          className="w-[90%] h-[90%] object-cover shadow-md shadow-black"
+        />
       </div>
       <div className="grid grid-cols-3 gap-8 justify-center items-center">
-        <BackwardIcon className="w-8 h-8 text-[#D0F0C0] hover:scale-110 transition-scale duration-300" />
+        <BackwardIcon
+          className="w-8 h-8 text-[#D0F0C0] hover:scale-110 transition-scale duration-300"
+          onClick={handlePreviousBottomsImage}
+        />
         <p> {/*empty cell */}</p>
-        <ForwardIcon className="w-8 h-8 text-[#D0F0C0] hover:scale-110 transition-scale duration-300"/>
+        <ForwardIcon
+          className="w-8 h-8 text-[#D0F0C0] hover:scale-110 transition-scale duration-300"
+          onClick={handleNextBottomsImage}
+        />
       </div>
     </div>
   );

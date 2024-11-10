@@ -10,6 +10,11 @@ const Drawers = dynamic(() => import('../Components/Drawers'), { ssr: false });
 
 export default function Closet() {
   const [showModal, setShowModal] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const handleUpload = () => {
+    setRefreshKey((prevKey) => prevKey + 1);
+  };
 
   return (
     <>
@@ -22,7 +27,7 @@ export default function Closet() {
         <main className="flex flex-col items-center mx-auto max-w-7xl">
           <div className="flex flex-col items-center">
             <h1 className="text-5xl font-bold tracking-tight text-[#D0F0C0]">Closet</h1>
-            <Drawers />
+            <Drawers refreshKey={refreshKey} />
 
             {/* Add New Outfit Button */}
             <button
@@ -32,7 +37,7 @@ export default function Closet() {
               Upload Item to Wardrobe
             </button>
 
-            <OutfitModal isVisible={showModal} onClose={() => setShowModal(false)} />
+            <OutfitModal isVisible={showModal} onClose={() => setShowModal(false)} onUpload={handleUpload} />
           </div>
         </main>
       </div>
