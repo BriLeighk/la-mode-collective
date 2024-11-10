@@ -6,18 +6,20 @@ import { getFirestore, collection, getDocs } from 'firebase/firestore';
 import { getStorage, ref, getDownloadURL } from 'firebase/storage';
 
 export default function Header() {
-  const [user, setUser] = useState(null);
-  const [showDropdown, setShowDropdown] = useState(false);
-  const [imageUrls, setImageUrls] = useState([]);
+  const [user, setUser] = useState(null); // State to store the current user
+  const [showDropdown, setShowDropdown] = useState(false); // State to control dropdown visibility
+  const [imageUrls, setImageUrls] = useState([]); // State to store image URLs
 
   useEffect(() => {
+    // Listen for authentication state changes
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
     });
-    return () => unsubscribe();
+    return () => unsubscribe(); // Cleanup subscription on unmount
   }, []);
 
   useEffect(() => {
+    // Fetch images from Firestore and get their download URLs
     const fetchImages = async () => {
       const db = getFirestore();
       const storage = getStorage();
@@ -32,30 +34,32 @@ export default function Header() {
         })
       );
 
-      setImageUrls(urls);
+      setImageUrls(urls); // Update state with image URLs
     };
 
     fetchImages();
   }, []);
 
   const handleProfileClick = () => {
+    // Redirect based on user authentication status
     if (typeof window !== 'undefined') {
       if (user) {
-        window.location.href = '/Dashboard';
+        window.location.href = '/Dashboard'; // Redirect to dashboard if logged in
       } else {
-        window.location.href = '/login';
+        window.location.href = '/login'; // Redirect to login if not logged in
       }
     }
   };
 
   const handleLogout = async () => {
+    // Handle user logout
     try {
       await logout();
       if (typeof window !== 'undefined') {
         window.location.href = '/login'; // Redirect to login page after logout
       }
     } catch (error) {
-      console.error('Error logging out:', error);
+      console.error('Error logging out:', error); // Log any errors
     }
   };
 

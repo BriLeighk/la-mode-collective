@@ -64,7 +64,7 @@ function Drawers({ refreshKey }) {
         let img;
         let woodTexture;
         let drawers = [
-          { x: -200, y: -100, z: 50, depth: 100, open: true }, // First drawer open by default
+          { x: -200, y: -100, z: 50, depth: 100, open: true }, // First drawer is open by default
           { x: -200, y: 40, z: -50, depth: 100, open: false },
           { x: -200, y: 150, z: -50, depth: 100, open: false }
         ];
@@ -90,8 +90,8 @@ function Drawers({ refreshKey }) {
 
           // Draw the dresser image in the background with a fixed width and centered
           p.push();
-          const dresserWidth = 750; // Set your desired fixed width
-          const dresserHeight = 700; // Set your desired fixed height
+          const dresserWidth = 750; // Fixed width for the dresser
+          const dresserHeight = 700; // Fixed height for the dresser
           p.translate(-dresserWidth / 2, -dresserHeight / 2, -200); // Center the dresser
           p.image(img, 0, 0, dresserWidth, dresserHeight);
           p.pop();
@@ -131,7 +131,7 @@ function Drawers({ refreshKey }) {
             p.stroke("#35261F");
             p.strokeWeight(4);
 
-            // Calculate the number of rows needed
+            // Calculate the number of rows needed for hangers
             const rows = Math.ceil(visibleHangers / 4);
             const rowSpacing = 60; // Adjust spacing between rows as needed
 

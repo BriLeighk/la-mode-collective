@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import dynamic from 'next/dynamic';
 import Header from '../Components/Header';
-import OutfitModal from './OutfitModal'; // Ensure the path is correct
+import OutfitModal from './OutfitModal'; // Ensure path is correct
 
 // Dynamically import components that rely on the window object
 const DoubleDoors = dynamic(() => import('../Components/DoubleDoors'), { ssr: false });
