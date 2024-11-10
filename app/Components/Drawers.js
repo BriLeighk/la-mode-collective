@@ -279,14 +279,6 @@ function Drawers({ refreshKey }) {
         ...currentPair,
         createdAt: new Date()
       });
-
-      // Update the state with the new pair
-      setOutfitPairs(prevPairs => {
-        const updatedPairs = [...prevPairs, currentPair];
-        setVisibleHangers(updatedPairs.length); // Update visible hangers
-        return updatedPairs;
-      });
-
       alert('Outfit pair saved successfully!');
     } catch (error) {
       console.error("Error saving outfit pair:", error);
@@ -380,6 +372,11 @@ function Drawers({ refreshKey }) {
               />
             ))}
           </div>
+        </div>
+      )}
+      {openDrawerIndex === 2 && (
+        <div className="flex flex-col items-center justify-center h-full">
+          <h2 className="text-2xl font-bold text-center mt-4">Coming Soon</h2>
         </div>
       )}
     </div>
