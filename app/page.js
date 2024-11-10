@@ -5,12 +5,20 @@ import Aos from "aos";
 import "aos/dist/aos.css";
 import About from "./Components/About";
 import Header from "./Components/Header";
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import { auth } from '../firebase';
+import { onAuthStateChanged } from 'firebase/auth';
 
 export default function Home() {
+  const [user, setUser] = useState(null);
+
   useEffect(() => {
     if (typeof window !== 'undefined') {
       Aos.init({ duration: 2000 });
+      const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+        setUser(currentUser);
+      });
+      return () => unsubscribe();
     }
   }, []);
 
@@ -36,17 +44,13 @@ export default function Home() {
             <div className="flex justify-end w-[calc(100%-2rem)] lg:w-[calc(100%-24rem)] gap-4 sm:flex-row mt-16">
               <a
                 className="rounded-full border border-solid border-transparent text-[#3D4941] transition-colors flex items-center justify-center bg-[#d0f0c0] text-background gap-2 dark:hover:bg-[#9AB28E] text-md h-8 px-4"
-                href=""
-                target="_blank"
-                rel="noopener noreferrer"
+                href="/login"
               >
                 ✦ Start Your Style Journey
               </a>
               <a
                 className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#3D4941] dark:hover:bg-[#3D4941] hover:border-transparent text-md h-8 px-4 sm:min-w-42"
-                href=""
-                target="_blank"
-                rel="noopener noreferrer"
+                href={user ? "/Dashboard" : "/login"}
               >
                 Explore My Closet
               </a>
