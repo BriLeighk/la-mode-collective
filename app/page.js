@@ -2,25 +2,14 @@ import Image from "next/image";
 import Aos from "aos";
 import "aos/dist/aos.css";
 import About from "./Components/About";
-
+import Header from "./Components/Header";
 export default function Home() {
   return (
     <>
     
     
     <div className="grid grid-rows-[20px_1fr_20px] items-center p-8 pb-20 gap-16 min-h-screen ">
-        <header className="grid grid-cols-2 gap-8 items-center p-4 lg:pl-8 lg:pr-8">
-          <a href="/">
-            <img src="/favicon.png" alt="La Mode Collective" className="w-24 h-24 justify-self-start object-contain hover:scale-110 transition-scale duration-300" 
-            />
-          </a>
-
-          <a href="/">
-            <img src="/profile.png" alt="La Mode Collective - Profile image for login" className="w-16 h-16 justify-self-end object-contain hover:scale-110 transition-scale duration-300 rounded-full" 
-            />
-          </a>
-            
-        </header>
+        <Header />
       
       <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start mt-20">
         <h1 className="text-7xl font-bold text-[#d0f0c0] mx-auto lg:text-8xl">La Mode ✦ Collective</h1>
