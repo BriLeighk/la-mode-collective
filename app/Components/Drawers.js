@@ -13,6 +13,7 @@ function Drawers({ refreshKey }) {
   const [outfitPairs, setOutfitPairs] = useState([]);
   const [hoveredPairIndex, setHoveredPairIndex] = useState(null);
   const [isPopupVisible, setIsPopupVisible] = useState(false);
+  const [openDrawerIndex, setOpenDrawerIndex] = useState(0); // Track which drawer is open
 
   useEffect(() => {
     const fetchImages = async () => {
@@ -27,7 +28,6 @@ function Drawers({ refreshKey }) {
         const imageRef = ref(storage, `${data.image}`);
         try {
           const url = await getDownloadURL(imageRef);
-          console.log(`Fetched URL: ${url}`);
           if (data.category === 'top') {
             imageUrls.push(url);
           } else if (data.category === 'bottom') {
@@ -62,7 +62,7 @@ function Drawers({ refreshKey }) {
         let img;
         let woodTexture;
         let drawers = [
-          { x: -200, y: -100, z: -50, depth: 100, open: false },
+          { x: -200, y: -100, z: 50, depth: 100, open: true }, // First drawer open by default
           { x: -200, y: 40, z: -50, depth: 100, open: false },
           { x: -200, y: 150, z: -50, depth: 100, open: false }
         ];
@@ -122,17 +122,19 @@ function Drawers({ refreshKey }) {
             p.pop();
           }
 
-          // Draw the clothing rack
-          p.push();
-          p.stroke("#35261F");
-          p.strokeWeight(4);
-          p.line(rodStartX, rodY, rodEndX, rodY);
+          // Conditionally draw the clothing rack if the first drawer is open
+          if (drawers[0].open) {
+            p.push();
+            p.stroke("#35261F");
+            p.strokeWeight(4);
+            p.line(rodStartX, rodY, rodEndX, rodY);
 
-          for (let i = 0; i < visibleHangers; i++) {
-            let x = rodStartX + spacing / 2 + (i * spacing);
-            drawOutlinedHanger(p, x, rodY + hangerDrop, i);
+            for (let i = 0; i < visibleHangers; i++) {
+              let x = rodStartX + spacing / 2 + (i * spacing);
+              drawOutlinedHanger(p, x, rodY + hangerDrop, i);
+            }
+            p.pop();
           }
-          p.pop();
         };
 
         function drawOutlinedHanger(p, x, y, index) {
@@ -208,6 +210,7 @@ function Drawers({ refreshKey }) {
                 }
               }
               drawer.open = !drawer.open;
+              setOpenDrawerIndex(i); // Update the open drawer index
             }
           }
         };
@@ -219,7 +222,7 @@ function Drawers({ refreshKey }) {
         p5Instance.remove();
       };
     }
-  }, [outfitPairs]);
+  }, [outfitPairs]); // Removed openDrawerIndex from dependencies to prevent reinitialization
 
   const handleNextImage = () => {
     setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
@@ -276,56 +279,73 @@ function Drawers({ refreshKey }) {
       className="flex flex-col items-center absolute top-[50%] left-[50%] transform -translate-x-1/2"
       onMouseLeave={() => setIsPopupVisible(false)}
     >
-      <HangerPopup
-        isVisible={isPopupVisible}
-        pair={outfitPairs[hoveredPairIndex]}
-        onClose={() => setIsPopupVisible(false)}
-      />
-      <div className="flex items-center justify-center w-[180px] h-[150px] bg-[#D0D0D0] shadow-md shadow-black mt-4">
-        <img
-          src={images[currentIndex] || '/image-placeholder.png'}
-          alt="Outfit"
-          className="w-[90%] h-[90%] object-cover shadow-md shadow-black"
-          onError={(e) => e.target.src = '/image-placeholder.png'}
-        />
-      </div>
-      <div className="grid grid-cols-3 gap-8 justify-center items-center">
-        <BackwardIcon
-          className="w-8 h-8 text-[#D0F0C0] hover:scale-110 transition-scale duration-300"
-          onClick={handlePreviousImage}
-        />
-        <p> {/*empty cell */}</p>
-        <ForwardIcon
-          className="w-8 h-8 text-[#D0F0C0] hover:scale-110 transition-scale duration-300"
-          onClick={handleNextImage}
-        />
-      </div>
-      <div className="flex items-center justify-center w-[180px] h-[150px] bg-[#D0D0D0] shadow-md shadow-black">
-        <img
-          src={bottomsImages[bottomsIndex] || '/bottoms-placeholder.png'}
-          alt="Bottom"
-          className="w-[90%] h-[90%] object-cover shadow-md shadow-black"
-          onError={(e) => e.target.src = '/bottoms-placeholder.png'}
-        />
-      </div>
-      <div className="grid grid-cols-3 gap-8 justify-center items-center">
-        <BackwardIcon
-          className="w-8 h-8 text-[#D0F0C0] hover:scale-110 transition-scale duration-300"
-          onClick={handlePreviousBottomsImage}
-        />
-        <p> {/*empty cell */}</p>
-        <ForwardIcon
-          className="w-8 h-8 text-[#D0F0C0] hover:scale-110 transition-scale duration-300"
-          onClick={handleNextBottomsImage}
-        />
-      </div>
-      <button
-        onClick={saveCurrentPair}
-        className="mt-4 px-4 py-2 bg-[#4D5D53] text-[#D0F0C0] font-semibold rounded-lg shadow-md hover:bg-[#D0D0D0] hover:text-[#4D5D53] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#88c9a7]"
-      >
-        Save Outfit Pair
-      </button>
-
+      {openDrawerIndex === 0 && (
+        <>
+          <HangerPopup
+            isVisible={isPopupVisible}
+            pair={outfitPairs[hoveredPairIndex]}
+            onClose={() => setIsPopupVisible(false)}
+          />
+          <div className="flex items-center justify-center w-[180px] h-[150px] bg-[#D0D0D0] shadow-md shadow-black mt-4">
+            <img
+              src={images[currentIndex] || '/image-placeholder.png'}
+              alt="Outfit"
+              className="w-[90%] h-[90%] object-cover shadow-md shadow-black"
+              onError={(e) => e.target.src = '/image-placeholder.png'}
+            />
+          </div>
+          <div className="grid grid-cols-3 gap-8 justify-center items-center">
+            <BackwardIcon
+              className="w-8 h-8 text-[#D0F0C0] hover:scale-110 transition-scale duration-300"
+              onClick={handlePreviousImage}
+            />
+            <p> {/*empty cell */}</p>
+            <ForwardIcon
+              className="w-8 h-8 text-[#D0F0C0] hover:scale-110 transition-scale duration-300"
+              onClick={handleNextImage}
+            />
+          </div>
+          <div className="flex items-center justify-center w-[180px] h-[150px] bg-[#D0D0D0] shadow-md shadow-black">
+            <img
+              src={bottomsImages[bottomsIndex] || '/bottoms-placeholder.png'}
+              alt="Bottom"
+              className="w-[90%] h-[90%] object-cover shadow-md shadow-black"
+              onError={(e) => e.target.src = '/bottoms-placeholder.png'}
+            />
+          </div>
+          <div className="grid grid-cols-3 gap-8 justify-center items-center">
+            <BackwardIcon
+              className="w-8 h-8 text-[#D0F0C0] hover:scale-110 transition-scale duration-300"
+              onClick={handlePreviousBottomsImage}
+            />
+            <p> {/*empty cell */}</p>
+            <ForwardIcon
+              className="w-8 h-8 text-[#D0F0C0] hover:scale-110 transition-scale duration-300"
+              onClick={handleNextBottomsImage}
+            />
+          </div>
+          <button
+            onClick={saveCurrentPair}
+            className="mt-4 px-4 py-2 bg-[#4D5D53] text-[#D0F0C0] font-semibold rounded-lg shadow-md hover:bg-[#D0D0D0] hover:text-[#4D5D53] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#88c9a7]"
+          >
+            Save Outfit Pair
+          </button>
+        </>
+      )}
+      {openDrawerIndex === 1 && (
+        <div className="grid grid-cols-3 gap-4">
+          {/* Render the second drawer content: rows of images */}
+          {bottomsImages.map((url, index) => (
+            <img
+              key={index}
+              src={url}
+              alt={`Bottom ${index}`}
+              className="w-24 h-24 object-cover"
+              style={{ transform: 'translateX(56px)' }}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
