@@ -7,11 +7,9 @@ export default function Home() {
   return (
     <>
     
-    
+    <Header />
     <div className="grid grid-rows-[20px_1fr_20px] items-center p-8 pb-20 gap-16 min-h-screen ">
-        <Header />
-      
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start mt-20">
+      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
         <h1 className="text-7xl font-bold text-[#d0f0c0] mx-auto lg:text-8xl">La Mode ✦ Collective</h1>
         
         <p className="text-4xl lg:text-5xl text-[#d0f0c0] mx-auto pb-14">
@@ -48,9 +46,10 @@ export default function Home() {
           >
             Explore My Closet
           </a>
-        </div>   
+        </div>
+        <About/>   
       </main>
-      <About />
+      
       <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
         
         
