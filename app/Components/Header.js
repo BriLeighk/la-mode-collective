@@ -9,7 +9,7 @@ export default function Header() {
             />
           </a>
 
-          <a href="/">
+          <a href="/login">
             <img src="/profile.png" alt="La Mode Collective - Profile image for login" className="w-16 h-16 justify-self-end object-contain hover:scale-110 transition-scale duration-300 rounded-full" 
             />
           </a>
