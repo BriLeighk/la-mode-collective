@@ -3,7 +3,7 @@ import p5 from 'p5';
 import { BackwardIcon, ForwardIcon } from '@heroicons/react/24/outline';
 import { getFirestore, collection, getDocs, addDoc } from "firebase/firestore";
 import { getStorage, ref, getDownloadURL } from "firebase/storage";
-import OutfitModal from './OutfitModal';
+import HangerPopup from './HangerPopup';
 
 function Drawers({ refreshKey }) {
   const [images, setImages] = useState([]);
@@ -12,6 +12,7 @@ function Drawers({ refreshKey }) {
   const [bottomsIndex, setBottomsIndex] = useState(0);
   const [outfitPairs, setOutfitPairs] = useState([]);
   const [hoveredPairIndex, setHoveredPairIndex] = useState(null);
+  const [isPopupVisible, setIsPopupVisible] = useState(false);
 
   useEffect(() => {
     const fetchImages = async () => {
@@ -24,12 +25,16 @@ function Drawers({ refreshKey }) {
       for (const doc of querySnapshot.docs) {
         const data = doc.data();
         const imageRef = ref(storage, `${data.image}`);
-        const url = await getDownloadURL(imageRef);
-
-        if (data.category === 'top') {
-          imageUrls.push(url);
-        } else if (data.category === 'bottom') {
-          bottomsUrls.push(url);
+        try {
+          const url = await getDownloadURL(imageRef);
+          console.log(`Fetched URL: ${url}`);
+          if (data.category === 'top') {
+            imageUrls.push(url);
+          } else if (data.category === 'bottom') {
+            bottomsUrls.push(url);
+          }
+        } catch (error) {
+          console.error("Error fetching image URL:", error);
         }
       }
 
@@ -131,10 +136,33 @@ function Drawers({ refreshKey }) {
         };
 
         function drawOutlinedHanger(p, x, y, index) {
+          p.push();
           p.stroke("#4D5D53");
           p.strokeWeight(2);
           p.noFill();
 
+          // Add hover detection
+          const canvasX = p.mouseX - p.width / 2;
+          const canvasY = p.mouseY - p.height / 2;
+          let isHovered = false;
+
+          if (canvasX > x - 15 && canvasX < x + 15 && canvasY > y - 10 && canvasY < y + 10) {
+            isHovered = true;
+            if (hoveredPairIndex !== index) {
+              setHoveredPairIndex(index);
+              setIsPopupVisible(true);
+            }
+          } else if (hoveredPairIndex === index) {
+            setHoveredPairIndex(null);
+            setIsPopupVisible(false);
+          }
+
+          // Levitate the hanger slightly if hovered
+          if (isHovered) {
+            p.translate(0, -2);
+          }
+
+          // Draw the hanger
           p.beginShape();
           p.vertex(x, y - 10);
           p.bezierVertex(x - 2.5, y - 20, x + 5, y - 20, x, y - 15);
@@ -161,10 +189,7 @@ function Drawers({ refreshKey }) {
           p.vertex(x + 16.5, y + 3.5);
           p.endShape();
 
-          // Add hover detection
-          if (p.mouseX > x - 15 && p.mouseX < x + 15 && p.mouseY > y - 10 && p.mouseY < y + 10) {
-            setHoveredPairIndex(index);
-          }
+          p.pop();
         }
 
         p.mousePressed = () => {
@@ -247,12 +272,21 @@ function Drawers({ refreshKey }) {
   };
 
   return (
-    <div className="flex flex-col items-center absolute top-[50%] left-[50%] transform -translate-x-1/2">
+    <div
+      className="flex flex-col items-center absolute top-[50%] left-[50%] transform -translate-x-1/2"
+      onMouseLeave={() => setIsPopupVisible(false)}
+    >
+      <HangerPopup
+        isVisible={isPopupVisible}
+        pair={outfitPairs[hoveredPairIndex]}
+        onClose={() => setIsPopupVisible(false)}
+      />
       <div className="flex items-center justify-center w-[180px] h-[150px] bg-[#D0D0D0] shadow-md shadow-black mt-4">
         <img
           src={images[currentIndex] || '/image-placeholder.png'}
           alt="Outfit"
           className="w-[90%] h-[90%] object-cover shadow-md shadow-black"
+          onError={(e) => e.target.src = '/image-placeholder.png'}
         />
       </div>
       <div className="grid grid-cols-3 gap-8 justify-center items-center">
@@ -271,6 +305,7 @@ function Drawers({ refreshKey }) {
           src={bottomsImages[bottomsIndex] || '/bottoms-placeholder.png'}
           alt="Bottom"
           className="w-[90%] h-[90%] object-cover shadow-md shadow-black"
+          onError={(e) => e.target.src = '/bottoms-placeholder.png'}
         />
       </div>
       <div className="grid grid-cols-3 gap-8 justify-center items-center">
@@ -290,11 +325,7 @@ function Drawers({ refreshKey }) {
       >
         Save Outfit Pair
       </button>
-      <OutfitModal
-        isVisible={hoveredPairIndex !== null}
-        onClose={() => setHoveredPairIndex(null)}
-        pair={outfitPairs[hoveredPairIndex]}
-      />
+
     </div>
   );
 }

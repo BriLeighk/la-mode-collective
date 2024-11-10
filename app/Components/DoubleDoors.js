@@ -69,8 +69,8 @@ const DoubleDoors = () => {
 
           // Draw right half of the lock on the left door
           p.strokeWeight(5);
-          p.stroke('#D0F0C0');
-          p.fill('#4D5D53');
+          p.stroke('#2D211B');
+          p.fill('#33251E');
           p.beginShape();
           for (let a = p.PI; a < p.TWO_PI; a += 0.1) { // Right half
               const r = 5;
@@ -91,7 +91,7 @@ const DoubleDoors = () => {
           p.endShape();
 
           // Draw lock details for right half on the left door
-          p.fill(160, 160, 160);
+          p.fill('#1A140E');
           p.noStroke();
           p.beginShape();
           p.vertex(-4 - doorOffset, 10);
@@ -100,16 +100,16 @@ const DoubleDoors = () => {
           p.vertex(-10 - doorOffset, 50);
           p.endShape(p.CLOSE);
 
-          p.fill(210, 210, 210);
+          p.fill('#1A140E');
           p.ellipse(-doorOffset, 0, 25, 25);
           p.ellipse(-doorOffset, 0, 20, 10);
 
-          p.stroke(255, 255, 255, 100);
+          p.stroke('#1A140E');
           p.strokeWeight(1);
           p.ellipse(-doorOffset, 50, 20, 8);
 
           // Draw lock details for left half on the right door
-          p.fill(160, 160, 160);
+          p.fill('#1A140E');
           p.noStroke();
           p.beginShape();
           p.vertex(-4 + doorOffset, 10);
@@ -118,11 +118,11 @@ const DoubleDoors = () => {
           p.vertex(-10 + doorOffset, 50);
           p.endShape(p.CLOSE);
 
-          p.fill(210, 210, 210);
+          p.fill('#1A140E');
           p.ellipse(doorOffset, 0, 25, 25);
           p.ellipse(doorOffset, 0, 20, 10);
 
-          p.stroke(255, 255, 255, 100);
+          p.stroke('#1A140E');
           p.strokeWeight(1);
           p.ellipse(doorOffset, 50, 20, 8);
 
