@@ -333,17 +333,33 @@ function Drawers({ refreshKey }) {
         </>
       )}
       {openDrawerIndex === 1 && (
-        <div className="grid grid-cols-3 gap-4">
-          {/* Render the second drawer content: rows of images */}
-          {bottomsImages.map((url, index) => (
-            <img
-              key={index}
-              src={url}
-              alt={`Bottom ${index}`}
-              className="w-24 h-24 object-cover"
-              style={{ transform: 'translateX(56px)' }}
-            />
-          ))}
+        <div className="flex flex-col gap-4 ml-16">
+          {/* Title for Tops */}
+          <h2 className="text-lg font-semibold text-center">Tops</h2>
+          {/* Render the second drawer content: first row for tops */}
+          <div className="flex flex-wrap justify-center gap-4">
+            {images.map((url, index) => (
+              <img
+                key={`top-${index}`}
+                src={url}
+                alt={`Top ${index}`}
+                className="w-20 h-20 object-cover"
+              />
+            ))}
+          </div>
+          {/* Title for Bottoms */}
+          <h2 className="text-lg font-semibold text-center">Bottoms</h2>
+          {/* Render the second drawer content: second row for bottoms */}
+          <div className="flex flex-wrap justify-center gap-4">
+            {bottomsImages.map((url, index) => (
+              <img
+                key={`bottom-${index}`}
+                src={url}
+                alt={`Bottom ${index}`}
+                className="w-20 h-20 object-cover"
+              />
+            ))}
+          </div>
         </div>
       )}
     </div>
