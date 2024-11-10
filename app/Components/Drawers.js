@@ -14,6 +14,7 @@ function Drawers({ refreshKey }) {
   const [hoveredPairIndex, setHoveredPairIndex] = useState(null);
   const [isPopupVisible, setIsPopupVisible] = useState(false);
   const [openDrawerIndex, setOpenDrawerIndex] = useState(0); // Track which drawer is open
+  const [visibleHangers, setVisibleHangers] = useState(4); // Initialize with a default value
 
   useEffect(() => {
     const fetchImages = async () => {
@@ -49,8 +50,9 @@ function Drawers({ refreshKey }) {
     const fetchOutfitPairs = async () => {
       const db = getFirestore();
       const querySnapshot = await getDocs(collection(db, 'outfitPairs'));
-      const pairs = querySnapshot.docs.slice(0, 4).map(doc => doc.data());
+      const pairs = querySnapshot.docs.map(doc => doc.data());
       setOutfitPairs(pairs);
+      setVisibleHangers(pairs.length); // Set the number of visible hangers to the number of pairs
     };
 
     fetchOutfitPairs();
@@ -71,7 +73,6 @@ function Drawers({ refreshKey }) {
         let rodStartX = 105;
         let rodEndX = 290;
         let spacing = 50;
-        let visibleHangers = 4;
         let hangerDrop = 10;
 
         p.preload = () => {
@@ -127,11 +128,22 @@ function Drawers({ refreshKey }) {
             p.push();
             p.stroke("#35261F");
             p.strokeWeight(4);
-            p.line(rodStartX, rodY, rodEndX, rodY);
 
-            for (let i = 0; i < visibleHangers; i++) {
-              let x = rodStartX + spacing / 2 + (i * spacing);
-              drawOutlinedHanger(p, x, rodY + hangerDrop, i);
+            // Calculate the number of rows needed
+            const rows = Math.ceil(visibleHangers / 4);
+            const rowSpacing = 60; // Adjust spacing between rows as needed
+
+            for (let row = 0; row < rows; row++) {
+              const yOffset = rodY + (row * rowSpacing);
+              p.line(rodStartX, yOffset, rodEndX, yOffset);
+
+              for (let i = 0; i < 4; i++) {
+                const hangerIndex = row * 4 + i;
+                if (hangerIndex >= visibleHangers) break; // Stop if no more hangers
+
+                let x = rodStartX + spacing / 2 + (i * spacing);
+                drawOutlinedHanger(p, x, yOffset + hangerDrop, hangerIndex);
+              }
             }
             p.pop();
           }
@@ -222,7 +234,7 @@ function Drawers({ refreshKey }) {
         p5Instance.remove();
       };
     }
-  }, [outfitPairs]); // Removed openDrawerIndex from dependencies to prevent reinitialization
+  }, [outfitPairs, visibleHangers]); // Add visibleHangers to dependencies
 
   const handleNextImage = () => {
     setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
