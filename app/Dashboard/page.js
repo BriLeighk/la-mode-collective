@@ -10,13 +10,6 @@ import Drawers from '../Components/Drawers'; // Ensure the path is correct
 export default function Closet() {
   const [showModal, setShowModal] = useState(false);
 
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      // Place your window-dependent code here
-      // Example: console.log(window.innerWidth);
-    }
-  }, []);
-
   return (
     <>
       {/* Double Doors Animation */}
