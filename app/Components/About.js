@@ -5,7 +5,7 @@
       <div className="relative isolate overflow-hidden">
         
         
-        <div className="mx-auto max-w-7xl px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl px-6 lg:px-8 mt-24">
           <div className="mx-auto max-w-2xl lg:mx-0">
             <h2 className="text-5xl font-semibold tracking-tight text-white sm:text-4xl text-[#D0F0C0]">About Us</h2>
             <p className="mt-8 text-pretty text-md font-medium text-white sm:text-md/8">
